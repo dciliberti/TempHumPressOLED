@@ -1,5 +1,5 @@
 # TempHumPressOLED
-Display temperature, humidity and pressure. Use a DHT22 sensor to acquire data about room relative humidity and temperature. Use a  BMP180 sensor to acquire pressure data. Display the values on a 0.96" OLED screen and through serial communication.
+Collect temperature, humidity and pressure data with and Arduino Nano (or Uno). Use a DHT22 sensor to acquire data about room relative humidity and temperature. Use a  BMP180 sensor to acquire pressure data. Display the values on a 0.96" OLED screen and through serial communication.
 
 Just write your altitude at line 37 to correct the barometric pressure.
 
