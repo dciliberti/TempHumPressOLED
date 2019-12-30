@@ -1,7 +1,9 @@
 # TempHumPressOLED
 Display temperature, humidity and pressure. Use a DHT22 sensor to acquire data about room relative humidity and temperature. Use a  BMP180 sensor to acquire pressure data. Display the values on a 0.96" OLED screen and through serial communication.
 
-This a step for the realization of a weather station.
+Just write your altitude at line 37 to correct the barometric pressure.
+
+The development of this device is a step for the realization of a weather station.
 
 ## Example output on the serial port
 ```
