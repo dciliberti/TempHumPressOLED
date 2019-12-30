@@ -5,15 +5,12 @@
    humidity and temperature. Use a 
    BMP180 sensor to acquire pressure
    data. Display the values on a 
-   0.96" OLED screen.
+   0.96" OLED screen an through
+   serial communication.
 ***********************************/
 
 // Libraries
-//#include <SPI.h>
-//#include <Wire.h>
-//#include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-//#include <OLED_I2C.h>
 #include <DHT.h>
 #include <SFE_BMP180.h>
 
@@ -29,7 +26,7 @@ DHT dht(2, DHT22);
 
 // Create the SFE_BMP180 object
 SFE_BMP180 pressure;
-// #define ALTITUDE 50.0 // My altitude in meters
+#define ALT 125.0 // My altitude in meters
 
 void setup() {
   Serial.begin(9600);
@@ -53,19 +50,26 @@ void setup() {
   Serial.println(F("REBOOT"));
   // Initialize the pressure sensor (it is important to get calibration values stored on the device).
   if (pressure.begin())
+  {
     Serial.println(F("BMP180 init success"));
+    Serial.print(F("Altitude set at "));
+    Serial.print(ALT);
+    Serial.println(F(" m above sea level"));
+    Serial.println(); // blank line
+    
+  }
   else
   {
     // Oops, something went wrong, this is usually a connection problem,
     // see the comments at the top of this sketch for the proper connections.
 
-    Serial.println(F("BMP180 init fail\n\n"));
+    Serial.println(F("BMP180 init fail"));
     while(1); // Pause forever
 
-//    display.setTextSize(2);
-//    display.setTextColor(WHITE);
-//    display.setCursor(0, 0);
-//    display.println("BMP180 init fail");
+    display.setTextSize(2);
+    display.setTextColor(WHITE);
+    display.setCursor(0, 0);
+    display.println(F("BMP180 init fail"));
   }
 
 }
@@ -73,30 +77,11 @@ void setup() {
 void loop() {
 
 // Variables
-float hum;        // Stores humidity value
-// float temp;       // Stores temperature value
-// float humidex;    // Stores humidex index value
 char status;
-double T, P;
+double T, P, H; // temperature, pressure, relative humidity
 
   // Pressure measurements
-
-  // If you want sea-level-compensated pressure, as used in weather reports,
-  // you will need to know the altitude at which your measurements are taken.
-  // We're using a constant called ALTITUDE in this sketch:
-  
-//  Serial.println();
-//  Serial.print("provided altitude: ");
-//  Serial.print(ALTITUDE,0);
-//  Serial.print(" meters, ");
-//  Serial.print(ALTITUDE*3.28084,0);
-//  Serial.println(" feet");
-//  
-  // If you want to measure altitude, and not pressure, you will instead need
-  // to provide a known baseline pressure. This is shown at the end of the sketch.
-
   // You must first get a temperature measurement to perform a pressure reading.
-  
   // Start a temperature measurement:
   // If request is successful, the number of ms to wait is returned.
   // If request is unsuccessful, 0 is returned.
@@ -114,12 +99,12 @@ double T, P;
     status = pressure.getTemperature(T);
     if (status != 0)
     {
-//      // Print out the measurement:
-//      Serial.print("temperature: ");
-//      Serial.print(T,2);
-//      Serial.print(" deg C, ");
-//      Serial.print((9.0/5.0)*T+32.0,2);
-//      Serial.println(" deg F");
+      // Print out the measurement:
+      Serial.print("temperature: ");
+      Serial.print(T,2);
+      Serial.print(" deg C, ");
+      Serial.print((9.0/5.0)*T+32.0,2);
+      Serial.println(" deg F");
       
       // Start a pressure measurement:
       // The parameter is the oversampling setting, from 0 to 3 (highest res, longest wait).
@@ -142,36 +127,24 @@ double T, P;
         if (status != 0)
         {
           // Print out the measurement:
-//          Serial.print("absolute pressure: ");
-//          Serial.print(P,2);
-//          Serial.print(" mb, ");
-//          Serial.print(P*0.0295333727,2);
-//          Serial.println(" inHg");
+          Serial.print("absolute pressure: ");
+          Serial.print(P,2);
+          Serial.print(" mb, ");
+          Serial.print(P*0.0295333727,2);
+          Serial.println(" inHg");
 
           // The pressure sensor returns abolute pressure, which varies with altitude.
           // To remove the effects of altitude, use the sealevel function and your current altitude.
           // This number is commonly used in weather reports.
-          // Parameters: P = absolute pressure in mb, ALTITUDE = current altitude in m.
+          // Parameters: P = absolute pressure in mb, ALT = current altitude in m.
           // Result: P = sea-level compensated pressure in mb
 
-          P = pressure.sealevel(P,50); // we're at 50 meters (San Paolo Bel Sito, NA)
-//          Serial.print("relative (sea-level) pressure: ");
-//          Serial.print(P,2);
-//          Serial.print(" mb, ");
-//          Serial.print(P*0.0295333727,2);
-//          Serial.println(" inHg");
-
-          // On the other hand, if you want to determine your altitude from the pressure reading,
-          // use the altitude function along with a baseline pressure (sea-level or other).
-          // Parameters: P = absolute pressure in mb, P = baseline pressure in mb.
-          // Result: a = altitude in m.
-
-//          a = pressure.altitude(P,P);
-//          Serial.print("computed altitude: ");
-//          Serial.print(a,0);
-//          Serial.print(" meters, ");
-//          Serial.print(a*3.28084,0);
-//          Serial.println(" feet");
+          P = pressure.sealevel(P,ALT);
+          Serial.print("relative (sea-level) pressure: ");
+          Serial.print(P,2);
+          Serial.print(" mb, ");
+          Serial.print(P*0.0295333727,2);
+          Serial.println(" inHg");
         }
         else Serial.println(F("error retrieving pressure measurement\n"));
       }
@@ -181,19 +154,25 @@ double T, P;
   }
   else Serial.println(F("error starting temperature measurement\n"));
   
+  // Serial print pressure
+  Serial.print("Pressure: ");
+  Serial.print(P,1);
+  Serial.print(" mb\t");
 
   // Read humidity and temperature
-  hum = dht.readHumidity();
-//  Serial.print("Humidity: ");
-//  Serial.print(hum,1);
-//  Serial.print("%\t");
+  H = dht.readHumidity();
+  Serial.print("Humidity: ");
+  Serial.print(H,1);
+  Serial.print("%\t\t");
 
   T = dht.readTemperature();
-//  Serial.print("Temperature: ");
-//  Serial.print(T,1);
-//  Serial.print("°C\t");
+  Serial.print("Temperature: ");
+  Serial.print(T,1);
+  Serial.println("°C");
+  Serial.println();             // blank line
 
   // Display values on screen
+  display.clearDisplay();       // avoid "noise" on the display due to serial print commands (unknown cause)
   display.setTextSize(2);
   display.setTextColor(WHITE);
   display.setCursor(0, 0);
@@ -208,43 +187,9 @@ double T, P;
   display.println("C");
 
   display.print("Hum: ");
-  display.print(hum,1);
+  display.print(H,1);
   display.println("%");
   display.display();
-
-//  // Calculates humidex index and display its status
-//  humidex = temp + (0.5555 * (0.06 * hum * pow(10,0.03*temp) -10));
-//  Serial.print("Humidex: ");
-//  Serial.print(humidex);
-//  Serial.print("\t");
-//
-//  // Humidex category
-//  if (humidex < 20){
-//    Serial.println("No index");
-//    display.println("No index");
-//  }
-//  else if (humidex >= 20 && humidex < 27){
-//    Serial.println("Comfort");
-//    display.println("Comfort");
-//  }
-//  else if (humidex >= 27 && humidex < 30){
-//    Serial.println("Caution");
-//    display.println("Caution");
-//  }
-//  else if (humidex >= 30 && humidex < 40){
-//    Serial.println("Extreme caution");
-//    display.println("CAUTION");
-//  }
-//  else if (humidex >= 40 && humidex < 55){
-//    Serial.println("Danger");
-//    display.println("Danger");
-//  }
-//  else {
-//    Serial.println("Extreme danger");
-//    display.println("DANGER");
-//  }
-//
-//  display.display();
 
   delay(10000);
   display.clearDisplay();
