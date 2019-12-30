@@ -1,13 +1,21 @@
-/**********************************
-   Display temperature, humidity and
-   pressure. Use a DHT22 sensor to 
-   acquire data about room relative
-   humidity and temperature. Use a 
-   BMP180 sensor to acquire pressure
-   data. Display the values on a 
-   0.96" OLED screen an through
-   serial communication.
-***********************************/
+/************************************************************************
+   Display temperature, humidity and pressure. Use a DHT22 sensor to 
+   acquire data about room relative humidity and temperature. Use a 
+   BMP180 sensor to acquire pressure data. Display the values on a 
+   0.96" OLED screen and through serial communication.
+
+    Copyright (C) 2018  Danilo Ciliberti dancili@gmail.com
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with this program. If not, see <https://www.gnu.org/licenses/>
+*************************************************************************/
 
 // Libraries
 #include <Adafruit_SSD1306.h>
