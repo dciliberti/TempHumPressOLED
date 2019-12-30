@@ -1,6 +1,6 @@
 /**********************************
-   Temperature, humidity and pressure
-   display. Use a DHT22 sensor to 
+   Display temperature, humidity and
+   pressure. Use a DHT22 sensor to 
    acquire data about room relative
    humidity and temperature. Use a 
    BMP180 sensor to acquire pressure
